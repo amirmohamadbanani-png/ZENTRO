@@ -16,6 +16,9 @@ A responsive multilingual workspace with 18 browser-based utilities and optional
 5. Run `npm start` and open `http://localhost:3000`.
 
 ## Deploy on Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://dashboard.render.com/blueprint/new?repo=https://github.com/amirmohamadbanani-png/ZENTRO)
+
 1. Push this project to the GitHub repository named `ZENTRO`.
 2. In Render create **New → Web Service**, connect the repository.
 3. Runtime: Node. Build command: `npm install`. Start command: `npm start`.
