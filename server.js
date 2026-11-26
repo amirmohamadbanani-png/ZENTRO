@@ -4,16 +4,11 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const ROOT = __dirname;
+const PUBLIC_DIR = path.join(__dirname, "public");
 
 app.disable("x-powered-by");
 app.use(express.json({ limit: "1mb" }));
-
-// Serve only the intended public assets. Keep server files and environment
-// files outside the static file surface.
-app.get("/", (_req, res) => res.sendFile(path.join(ROOT, "index.html")));
-app.get("/app.js", (_req, res) => res.sendFile(path.join(ROOT, "app.js")));
-app.get("/style.css", (_req, res) => res.sendFile(path.join(ROOT, "style.css")));
+app.use(express.static(PUBLIC_DIR));
 
 app.get("/api/status", (_req, res) => {
   res.json({
@@ -42,7 +37,6 @@ app.post("/api/ai", async (req, res) => {
     translate: `Translate the following text into ${String(language || "English").slice(0, 60)}. Return only the translation.`,
     rewrite: "Rewrite this text to be clearer, more natural, and well organized."
   };
-  const instruction = prompts[task] || prompts.rewrite;
 
   try {
     const base = (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/$/, "");
@@ -55,7 +49,7 @@ app.post("/api/ai", async (req, res) => {
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL || "gpt-4o-mini",
         messages: [
-          { role: "system", content: `You are ZENTRO, a helpful writing assistant. ${instruction}` },
+          { role: "system", content: `You are ZENTRO, a helpful writing assistant. ${prompts[task] || prompts.rewrite}` },
           { role: "user", content: text.slice(0, 20000) }
         ],
         temperature: 0.7
@@ -64,21 +58,14 @@ app.post("/api/ai", async (req, res) => {
 
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      return res.status(502).json({
-        error: data.error?.message || "AI provider request failed."
-      });
+      return res.status(502).json({ error: data.error?.message || "AI provider request failed." });
     }
-    return res.json({
-      result: data.choices?.[0]?.message?.content || "No response returned."
-    });
+    return res.json({ result: data.choices?.[0]?.message?.content || "No response returned." });
   } catch (_error) {
-    return res.status(502).json({
-      error: "Could not connect to the AI provider. Check the server configuration."
-    });
+    return res.status(502).json({ error: "Could not connect to the AI provider. Check the server configuration." });
   }
 });
 
-// Unknown routes return the homepage so refreshes on the single-page site work.
-app.get("*", (_req, res) => res.sendFile(path.join(ROOT, "index.html")));
+app.get("*", (_req, res) => res.sendFile(path.join(PUBLIC_DIR, "index.html")));
 
 app.listen(PORT, () => console.log(`ZENTRO running on port ${PORT}`));
