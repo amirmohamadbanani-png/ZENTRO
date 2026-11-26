@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111126">
+  <meta name="description" content="ZENTRO — a colorful workspace of useful tools and AI helpers.">
+  <title>ZENTRO — Tools for your ideas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="ambient a1"></div><div class="ambient a2"></div>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark">Z</span><span>ZENTRO</span></a>
+    <nav><a href="#tools" data-i18n="navTools">Tools</a><a href="#ai" data-i18n="navAI">AI Studio</a><a href="#about" data-i18n="navAbout">About</a></nav>
+    <div class="top-actions">
+      <select id="language" aria-label="Language">
+        <option value="en">English</option><option value="fa">فارسی</option><option value="es">Español</option>
+        <option value="fr">Français</option><option value="de">Deutsch</option><option value="it">Italiano</option>
+        <option value="pt">Português</option><option value="tr">Türkçe</option><option value="ar">العربية</option>
+        <option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option><option value="hi">हिन्दी</option>
+      </select>
+      <a class="github-link" href="https://github.com" target="_blank" rel="noreferrer">GitHub ↗</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow"><span class="pulse"></span><span data-i18n="eyebrow">YOUR EVERYDAY DIGITAL WORKSPACE</span></div>
+      <h1 data-i18n="heroTitle">Big ideas.<br><span>Simple tools.</span></h1>
+      <p data-i18n="heroText">A colorful space to create, calculate, convert and get things done — all in one place.</p>
+      <div class="hero-actions"><a class="button primary" href="#tools" data-i18n="explore">Explore tools <span>↓</span></a><a class="button ghost" href="#ai" data-i18n="tryAI">Try AI Studio ↗</a></div>
+      <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+      <div class="hero-sticker sticker-one">✦</div><div class="hero-sticker sticker-two">✳</div>
+    </section>
+
+    <section class="stats">
+      <div><strong>18</strong><span data-i18n="statTools">Useful tools</span></div><div><strong>13</strong><span data-i18n="statLang">Languages</span></div><div><strong>01</strong><span data-i18n="statPlace">One workspace</span></div>
+    </section>
+
+    <section id="tools" class="section">
+      <div class="section-heading"><div><div class="eyebrow" data-i18n="toolEyebrow">THE TOOLBOX</div><h2 data-i18n="toolTitle">Find your flow.</h2></div><input id="searchTools" class="search" type="search" placeholder="Search tools..." data-i18n-placeholder="searchPlaceholder"></div>
+      <div class="tool-grid" id="toolGrid"></div>
+    </section>
+
+    <section id="ai" class="section ai-section">
+      <div class="section-heading"><div><div class="eyebrow" data-i18n="aiEyebrow">A LITTLE HELP FROM AI</div><h2 data-i18n="aiTitle">Make more happen.</h2></div><span class="tag">ZENTRO AI</span></div>
+      <div class="ai-panel">
+        <div class="ai-tabs">
+          <button class="active" data-task="prompt">✦ <span data-i18n="aiPrompt">Prompt maker</span></button>
+          <button data-task="caption">☻ <span data-i18n="aiCaption">Captions</span></button>
+          <button data-task="summarize">▤ <span data-i18n="aiSummary">Summarizer</span></button>
+          <button data-task="translate">↔ <span data-i18n="aiTranslate">Translator</span></button>
+          <button data-task="rewrite">✎ <span data-i18n="aiRewrite">Rewriter</span></button>
+        </div>
+        <div class="ai-workspace">
+          <label for="aiInput" data-i18n="yourText">YOUR TEXT OR IDEA</label>
+          <textarea id="aiInput" rows="5" placeholder="Write an idea, paste text, or describe what you need..."></textarea>
+          <div class="ai-bottom"><select id="targetLanguage"><option>English</option><option>Persian</option><option>Spanish</option><option>French</option><option>German</option><option>Arabic</option></select><button class="button primary" id="runAI" data-i18n="generate">Generate ✦</button></div>
+          <div id="aiOutput" class="output" aria-live="polite"><span data-i18n="aiOutputHint">Your result will appear here.</span></div>
+        </div>
+      </div>
+      <p class="small-note" data-i18n="aiNote">AI features need an API key configured by the site owner. Your key stays on the server, never in this page.</p>
+    </section>
+
+    <section id="about" class="about-card"><div><div class="eyebrow" data-i18n="aboutEyebrow">MADE TO BE USEFUL</div><h2 data-i18n="aboutTitle">Less searching.<br>More creating.</h2><p data-i18n="aboutText">ZENTRO brings handy everyday utilities and AI-powered writing into one friendly workspace.</p></div><div class="about-symbol">Z<span>✦</span></div></section>
+  </main>
+  <footer><a class="brand" href="#"><span class="brand-mark">Z</span><span>ZENTRO</span></a><span>© <span id="year"></span> ZENTRO. <span data-i18n="footer">Made for curious minds.</span></span><a href="/api/status" target="_blank">API status ↗</a></footer>
+
+  <dialog id="toolDialog"><div class="dialog-head"><div><span class="eyebrow">ZENTRO TOOL</span><h3 id="dialogTitle">Tool</h3></div><button class="close" id="closeDialog" aria-label="Close">×</button></div><div id="dialogBody"></div></dialog>
+  <script src="/app.js"></script>
+</body>
+</html>
