@@ -5,6 +5,9 @@ on:
   push:
     branches: [android-app]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,24 +32,19 @@ jobs:
       - name: Build installable debug APK
         working-directory: android
         run: ./gradlew assembleDebug
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: zentro-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
-      - name: Build release APK
-        working-directory: android
-        run: ./gradlew assembleRelease
-      - name: Upload release APK (unsigned unless signing is configured)
-        uses: actions/upload-artifact@v4
+      - name: Publish installable APK on GitHub Releases
+        uses: softprops/action-gh-release@v2
         with:
-          name: zentro-release-apk-unsigned
-          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
-      - name: Build release Android App Bundle
-        working-directory: android
-        run: ./gradlew bundleRelease
-      - name: Upload unsigned AAB (requires signing before Play upload)
-        uses: actions/upload-artifact@v4
-        with:
-          name: zentro-release-aab-unsigned
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          tag_name: android-latest
+          name: ZENTRO Android - Latest
+          body: |
+            ZENTRO Android install package.
+            This is an early testing build. Download zentro-android.apk and install it on an Android device.
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+          make_latest: true
+          overwrite_files: true
