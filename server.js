@@ -4,8 +4,16 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const ROOT = __dirname;
+
+app.disable("x-powered-by");
 app.use(express.json({ limit: "1mb" }));
-app.use(express.static(path.join(__dirname, "public")));
+
+// Serve only the intended public assets. Keep server files and environment
+// files outside the static file surface.
+app.get("/", (_req, res) => res.sendFile(path.join(ROOT, "index.html")));
+app.get("/app.js", (_req, res) => res.sendFile(path.join(ROOT, "app.js")));
+app.get("/style.css", (_req, res) => res.sendFile(path.join(ROOT, "style.css")));
 
 app.get("/api/status", (_req, res) => {
   res.json({
@@ -26,43 +34,51 @@ app.post("/api/ai", async (req, res) => {
   if (typeof text !== "string" || !text.trim()) {
     return res.status(400).json({ error: "Please enter some text first." });
   }
+
   const prompts = {
     prompt: "Improve this idea and turn it into a clear, detailed AI prompt.",
     caption: "Write 5 engaging social media captions for this content.",
     summarize: "Summarize this text clearly. Keep the important points.",
-    translate: `Translate the following text into ${language || "English"}. Return only the translation.`,
+    translate: `Translate the following text into ${String(language || "English").slice(0, 60)}. Return only the translation.`,
     rewrite: "Rewrite this text to be clearer, more natural, and well organized."
   };
   const instruction = prompts[task] || prompts.rewrite;
+
   try {
     const base = (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/$/, "");
     const response = await fetch(`${base}/chat/completions`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL || "gpt-4o-mini",
         messages: [
           { role: "system", content: `You are ZENTRO, a helpful writing assistant. ${instruction}` },
-          { role: "user", content: text }
+          { role: "user", content: text.slice(0, 20000) }
         ],
         temperature: 0.7
       })
     });
-    const data = await response.json();
+
+    const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      return res.status(response.status).json({ error: data.error?.message || "AI provider request failed." });
+      return res.status(502).json({
+        error: data.error?.message || "AI provider request failed."
+      });
     }
-    res.json({ result: data.choices?.[0]?.message?.content || "No response returned." });
+    return res.json({
+      result: data.choices?.[0]?.message?.content || "No response returned."
+    });
   } catch (_error) {
-    res.status(500).json({ error: "Could not connect to the AI provider. Check the server configuration." });
+    return res.status(502).json({
+      error: "Could not connect to the AI provider. Check the server configuration."
+    });
   }
 });
 
-app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+// Unknown routes return the homepage so refreshes on the single-page site work.
+app.get("*", (_req, res) => res.sendFile(path.join(ROOT, "index.html")));
 
 app.listen(PORT, () => console.log(`ZENTRO running on port ${PORT}`));
