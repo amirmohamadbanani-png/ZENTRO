@@ -12,20 +12,23 @@ app.use(cors({ origin: ["https://localhost", "capacitor://localhost", "https://z
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(PUBLIC_DIR));
 
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+
 app.get("/api/status", (_req, res) => {
   res.json({
     ok: true,
     service: "ZENTRO API",
-    aiConfigured: Boolean(process.env.OPENAI_API_KEY),
-    model: process.env.OPENAI_MODEL || "gpt-4o-mini"
+    aiConfigured: Boolean(process.env.GEMINI_API_KEY),
+    aiProvider: "Google Gemini",
+    model: GEMINI_MODEL
   });
 });
 
 app.post("/api/ai", async (req, res) => {
   const { task, text, language } = req.body || {};
-  if (!process.env.OPENAI_API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     return res.status(503).json({
-      error: "AI is not configured yet. Add OPENAI_API_KEY in your hosting environment."
+      error: "AI is not configured yet. The site owner must add GEMINI_API_KEY to the hosting environment."
     });
   }
   if (typeof text !== "string" || !text.trim()) {
@@ -41,28 +44,36 @@ app.post("/api/ai", async (req, res) => {
   };
 
   try {
-    const base = (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/$/, "");
-    const response = await fetch(`${base}/chat/completions`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
-        messages: [
-          { role: "system", content: `You are ZENTRO, a helpful writing assistant. ${prompts[task] || prompts.rewrite}` },
-          { role: "user", content: text.slice(0, 20000) }
-        ],
-        temperature: 0.7
-      })
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(process.env.GEMINI_API_KEY)}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: `You are ZENTRO, a helpful writing assistant. ${prompts[task] || prompts.rewrite}` }]
+          },
+          contents: [{ role: "user", parts: [{ text: text.slice(0, 20000) }] }],
+          generationConfig: { temperature: 0.7, maxOutputTokens: 2048 }
+        })
+      }
+    );
 
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      return res.status(502).json({ error: data.error?.message || "AI provider request failed." });
+      const message = data.error?.message || "Gemini request failed. Check the server API key and free-tier quota.";
+      return res.status(502).json({ error: message });
     }
-    return res.json({ result: data.choices?.[0]?.message?.content || "No response returned." });
+
+    const result = (data.candidates?.[0]?.content?.parts || [])
+      .map(part => part.text || "")
+      .join("")
+      .trim();
+
+    if (!result) {
+      return res.status(502).json({ error: "The AI provider returned an empty response. Please try again." });
+    }
+    return res.json({ result });
   } catch (_error) {
     return res.status(502).json({ error: "Could not connect to the AI provider. Check the server configuration." });
   }
@@ -70,4 +81,4 @@ app.post("/api/ai", async (req, res) => {
 
 app.get("*", (_req, res) => res.sendFile(path.join(PUBLIC_DIR, "index.html")));
 
-app.listen(PORT, () => console.log(`ZENTRO running on port ${PORT}`));
+app.listen(PORT, () => console.log("ZENTRO running on port " + PORT));
