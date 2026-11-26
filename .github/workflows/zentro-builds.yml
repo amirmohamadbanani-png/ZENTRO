@@ -1,0 +1,99 @@
+name: ZENTRO App Builds
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out latest website source
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Add Android platform
+        run: npx cap add android
+      - name: Sync ZENTRO into Android
+        run: npx cap sync android
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Build installable APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - name: Prepare APK release file
+        run: |
+          mkdir -p release-assets
+          cp android/app/build/outputs/apk/debug/app-debug.apk release-assets/zentro-android.apk
+      - name: Upload Android package
+        uses: actions/upload-artifact@v4
+        with:
+          name: zentro-android-package
+          path: release-assets/zentro-android.apk
+
+  windows:
+    name: Build Windows installer
+    runs-on: windows-latest
+    steps:
+      - name: Check out latest website source
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Build Windows installer
+        run: npm run desktop:build:win
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: zentro-windows-installer
+          path: dist/zentro-windows-setup.exe
+
+  publish:
+    name: Publish downloads
+    needs: [android, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Android package
+        uses: actions/download-artifact@v4
+        with:
+          name: zentro-android-package
+          path: release-assets
+      - name: Download Windows installer
+        uses: actions/download-artifact@v4
+        with:
+          name: zentro-windows-installer
+          path: release-assets
+      - name: Publish both installers
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: zentro-latest
+          name: ZENTRO - Latest Android and Windows
+          body: |
+            ZENTRO installers for Android and Windows.
+            Android: install the APK on your Android phone.
+            Windows: run the setup EXE to install the desktop app.
+            These early builds connect to the online ZENTRO service and require internet access.
+          files: |
+            release-assets/zentro-android.apk
+            release-assets/zentro-windows-setup.exe
+          make_latest: true
+          overwrite_files: true
