@@ -57,6 +57,6 @@ $("#closeDialog").onclick=()=>dialog.close();dialog.addEventListener("click",e=>
 $("#searchTools").addEventListener("input",e=>renderTools(e.target.value));
 $("#language").addEventListener("change",e=>setLang(e.target.value));
 document.querySelectorAll(".ai-tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".ai-tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active");activeTask=b.dataset.task});
-async function callAI(task,text){if(!text.trim())throw Error("Enter some text first.");$("#aiOutput").textContent="Working…";let r=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task,text,language:$("#targetLanguage").value})});let d=await r.json();if(!r.ok)throw Error(d.error||"AI request failed.");$("#aiOutput").textContent=d.result}
+async function callAI(task,text){if(!text.trim())throw Error("Enter some text first.");$("#aiOutput").textContent="Working…";let r=await fetch("https://zentro-usle.onrender.com/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task,text,language:$("#targetLanguage").value})});let d=await r.json();if(!r.ok)throw Error(d.error||"AI request failed.");$("#aiOutput").textContent=d.result}
 $("#runAI").onclick=()=>callAI(activeTask,$("#aiInput").value).catch(e=>$("#aiOutput").textContent=e.message);
 $("#year").textContent=new Date().getFullYear();renderTools();setLang("en");
