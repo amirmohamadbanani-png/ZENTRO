@@ -10,12 +10,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
+  <style>
+    .download-section{margin:72px auto;max-width:1080px;padding:0 24px}
+    .download-card{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:28px;padding:clamp(26px,5vw,52px);border:1px solid rgba(160,145,255,.24);border-radius:28px;background:linear-gradient(135deg,rgba(99,83,210,.22),rgba(27,25,59,.88));box-shadow:0 24px 80px rgba(0,0,0,.18)}
+    .download-copy{max-width:620px;position:relative;z-index:1}
+    .download-copy h2{font-size:clamp(28px,4vw,42px);margin:12px 0}
+    .download-copy p{line-height:1.8;color:var(--muted,#b8b5d0)}
+    .download-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+    .download-note{font-size:13px;margin-top:16px;opacity:.78}
+    .download-mark{flex:0 0 116px;width:116px;height:116px;display:grid;place-items:center;border-radius:30px;background:linear-gradient(145deg,#a89aff,#6654d9);font-size:64px;font-weight:800;color:white;box-shadow:0 16px 50px rgba(102,84,217,.35)}
+    @media(max-width:650px){.download-card{align-items:flex-start;flex-direction:column-reverse}.download-mark{width:76px;height:76px;flex-basis:76px;font-size:42px;border-radius:22px}}
+  </style>
 </head>
 <body>
   <div class="ambient a1"></div><div class="ambient a2"></div>
   <header class="topbar">
     <a class="brand" href="#"><span class="brand-mark">Z</span><span>ZENTRO</span></a>
-    <nav><a href="#tools" data-i18n="navTools">Tools</a><a href="#ai" data-i18n="navAI">AI Studio</a><a href="#about" data-i18n="navAbout">About</a></nav>
+    <nav><a href="#tools" data-i18n="navTools">Tools</a><a href="#ai" data-i18n="navAI">AI Studio</a><a href="#download">Android App</a><a href="#about" data-i18n="navAbout">About</a></nav>
     <div class="top-actions">
       <select id="language" aria-label="Language">
         <option value="en">English</option><option value="fa">فارسی</option><option value="es">Español</option>
@@ -23,7 +34,7 @@
         <option value="pt">Português</option><option value="tr">Türkçe</option><option value="ar">العربية</option>
         <option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option><option value="hi">हिन्दी</option>
       </select>
-      <a class="github-link" href="https://github.com" target="_blank" rel="noreferrer">GitHub ↗</a>
+      <a class="github-link" href="https://github.com/amirmohamadbanani-png/ZENTRO" target="_blank" rel="noreferrer">GitHub ↗</a>
     </div>
   </header>
 
@@ -64,6 +75,22 @@
         </div>
       </div>
       <p class="small-note" data-i18n="aiNote">AI features need an API key configured by the site owner. Your key stays on the server, never in this page.</p>
+    </section>
+
+    <section id="download" class="download-section">
+      <div class="download-card">
+        <div class="download-copy">
+          <div class="eyebrow"><span class="pulse"></span> ZENTRO FOR ANDROID</div>
+          <h2>Take ZENTRO with you.</h2>
+          <p>Download the Android app and use ZENTRO from your phone. دریافت نسخه اندروید ZENTRO و نصب مستقیم روی گوشی.</p>
+          <div class="download-actions">
+            <a class="button primary" href="https://github.com/amirmohamadbanani-png/ZENTRO/releases/latest/download/app-debug.apk">Download APK ↓</a>
+            <a class="button ghost" href="https://github.com/amirmohamadbanani-png/ZENTRO/releases" target="_blank" rel="noreferrer">Release details ↗</a>
+          </div>
+          <p class="download-note">Early testing build · Android only · After downloading, open the APK file to install. Your phone may ask you to allow installation from your browser.</p>
+        </div>
+        <div class="download-mark" aria-hidden="true">Z</div>
+      </div>
     </section>
 
     <section id="about" class="about-card"><div><div class="eyebrow" data-i18n="aboutEyebrow">MADE TO BE USEFUL</div><h2 data-i18n="aboutTitle">Less searching.<br>More creating.</h2><p data-i18n="aboutText">ZENTRO brings handy everyday utilities and AI-powered writing into one friendly workspace.</p></div><div class="about-symbol">Z<span>✦</span></div></section>
